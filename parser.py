@@ -1,10 +1,32 @@
-from sys import argv
+from typing import Any
 from py_pdf_parser.loaders import load_file
 from py_pdf_parser import tables
 import csv
-from tabulate import tabulate
-import re
-from py_pdf_parser.visualise import visualise
+
+class ParserDiff:
+  def __init__(self, docname: str, msg: str, parserText = '', otherParserText = ''):
+    self.docname = docname
+    self.msg = msg
+    self.diff = None if parserText == '' or otherParserText == '' else {
+      'from': parserText,
+      'to': otherParserText
+    }
+
+    self.__dict__ = {
+      "docname": self.docname,
+      "msg": self.msg,
+      "diff": self.diff
+    }
+
+  def __str__(self) -> str:
+    return str(self.__dict__)
+
+  def __unicode__(self) -> str:
+    return self.__str__()
+
+  def __repr__(self) -> str:
+    return self.__str__()
+
 
 class Parser:
 
@@ -38,31 +60,15 @@ class Parser:
       "Plazos de Seguridad (Protección del Consumidor)"
     ).extract_single_element()
 
-    page = 2
-    heading = self.headings[page]
-    footer = self.footers[page]
-    self.elements = self.document.elements.after(self.header).before(self.post_table).between(
-      heading, footer
+    self.elements = self.document.elements.between(
+      self.header, self.post_table
     ).filter_by_font("table_element")
-
-    page += 1
-    while (page < len(self.headings)):
-      heading = self.headings[page]
-      footer = self.footers[page]
-      elements = self.document.elements.after(self.header).before(self.post_table).between(
-        heading, footer
-      ).filter_by_font("table_element")
-      self.elements = self.elements.add_elements(
-        *elements
-      )
-      page += 1
 
     self.table = tables.extract_table(
       self.elements,
       as_text=True,
       fix_element_in_multiple_rows=True,
       fix_element_in_multiple_cols=True,
-      tolerance=1000
     )
 
   def thead(self):
@@ -83,52 +89,12 @@ class Parser:
       file = csv.writer(f)
       file.writerows(table)
 
-  def single_page_format(self):
+  def format(self):
     arr = []
     for row in self.table:
       arr.append([row[0], row[1], row[2]])
 
     return arr
-
-# Actualmente 'single_page_format' sirve para todas las tablas.
-# Con el nuevo formato directamente no funciona
-  def multi_page_format(self):
-    arr = []
-    for row in self.table:
-      por_filtrar = row[6]
-
-      if (re.search('^Ámbito', por_filtrar)):
-        por_filtrar = ''
-
-      usos = row[0] + row[1] + row[2]
-      agentes = row[3]
-      dosis = por_filtrar + row[7]
-
-      if (re.search('Página', usos)):
-        usos = ''
-      arr.append([usos, agentes, dosis])
-
-    self.multi_page_fix(arr)
-    return arr
-
-  def multi_page_fix(self, table):
-    arr = []
-    for i in range(0, len(table)):
-      row = table[i]
-      if not row[1]:
-        last_row = table[i-1]
-        print('---MATCH----')
-        print('---BEFORE---')
-        print(last_row)
-        print('---ROW------')
-        print(row)
-
-    return arr
-
-  def format(self):
-    # if thead()[0] == '':
-    #   return multi_page_format()
-    return self.single_page_format()
 
   def get_raw_text(self):
     arr = []
@@ -141,15 +107,21 @@ class Parser:
     for i in range(0, len(element_list)):
       print(i+1, element_list[i], '\n')
 
-# formated_table = format()
-# to_csv(table=formated_table)
-# print(tabulate(formated_table))
+  def equals(self, other: 'Parser'):
+    return ''.join(self.get_raw_text()) == ''.join(other.get_raw_text());
 
-# print(to_csv())
+  def diff(self, other: 'Parser') -> list[ParserDiff]:
+    arr = []
+    selfLen = len(self.table)
+    otherLen = len(other.table)
+    if selfLen != otherLen:
+      arr.append(ParserDiff(self.docname, 'La cantidad de elementos no coincide'))
 
-docname = argv[1] if len(argv) > 1 else './fichas/ES-00318.pdf'
-out_docname = argv[2] if len(argv) > 2 else 'parser.csv'
+    for index in range(0, min(selfLen, otherLen)):
+      selfText = ''.join(self.table[index])
+      otherText = ''.join(other.table[index])
+      if (selfText != otherText):
+        arr.append(ParserDiff(self.docname, 'El texto no coincide', selfText, otherText))
 
-parser = Parser(docname, out_docname)
 
-print(tabulate(parser.format()))
+    return arr
