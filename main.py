@@ -1,10 +1,9 @@
 from parser import Parser, ParserDiff
-from sys import argv
-from tabulate import tabulate
 from os import listdir
-from os.path import isfile, join
+from os.path import isdir, isfile, join
 from rich import print as rprint
 from json import dumps as json
+import argparse
 
 def diffsToDicts(diffs: list[ParserDiff]):
   dictionaryDiffs: list[dict] = []
@@ -32,8 +31,9 @@ def get_files(path: str) -> list[str]:
 
   return files
 
-docname = argv[1] if len(argv) > 1 else './fichas/ES-00318.pdf'
-out_docname = argv[2] if len(argv) > 2 else 'parser.csv'
+parser = argparse.ArgumentParser()
+parser.add_argument('-o', '--out', type=str, help='Archivo JSON de salida')
+args = parser.parse_args()
 
 old_path = './old'
 new_path = './new'
@@ -66,3 +66,5 @@ for old_file in old_files:
 
 printDiffs(diffs)
 
+if args.out != None and not isdir(args.out):
+    writeDiffs(diffs, args.out)
