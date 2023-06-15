@@ -8,8 +8,8 @@ class ParserDiff:
     self.docname = docname
     self.msg = msg
     self.diff = None if parserText == '' or otherParserText == '' else {
-      'from': parserText,
-      'to': otherParserText
+      'to': parserText,
+      'from': otherParserText
     }
 
     self.__dict__ = {
@@ -30,9 +30,9 @@ class ParserDiff:
 
 class Parser:
 
-  def __init__(self, pdf_name, csv_name):
+  def __init__(self, pdf_name: str, csv_name: str | None = None):
     self.docname = pdf_name
-    self.out_docname = csv_name
+    self.out_docname = csv_name if csv_name != None else pdf_name.replace('.pdf', '.csv')
 
     self.FONT_MAPPING = {
       "Helvetica-Bold,12.0": "header",

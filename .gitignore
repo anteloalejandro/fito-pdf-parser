@@ -1,4 +1,4 @@
 *.csv
 *.pdf
-
+*.json
 __pycache__/
