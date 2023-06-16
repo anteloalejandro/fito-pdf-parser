@@ -31,19 +31,21 @@ def get_files(path: str) -> list[str]:
 
   return files
 
+# Argumentos
 parser = argparse.ArgumentParser(description="Parser para PDFs de productos fitosanitarios")
 parser.add_argument('-o', '--out', type=str, help='Archivo JSON de salida')
 parser.add_argument('--old', type=str, help='Directorio con las versiones viejas de los PDF')
 parser.add_argument('--new', type=str, help='Directorio con las versiones nuevas de los PDF')
 args = parser.parse_args()
 
+# Rutas
 old_path = './old' if args.old == None else args.old
 new_path = './new' if args.new == None else args.new
 old_files = get_files(old_path)
 new_files = get_files(new_path)
 
+# Sacar diferencias entre PDFs
 diffs: list[ParserDiff] = []
-
 for old_file in old_files:
   new_file_path = old_file.replace(old_path, new_path)
   try:
