@@ -105,3 +105,11 @@ Ambas acciones responden con un JSON con el siguiente resultado:
 ]
 
  ```
+
+# TO-DO
+
+- [ ] Opción para no imprimir el resultado
+- [ ] Agrupar por fichero
+- [ ] Separar diferencias por columna
+- [ ] Mejorar rendimiento
+- [ ] Añadir opción para exportar los PDFs en CSV
