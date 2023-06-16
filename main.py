@@ -1,9 +1,16 @@
 from parser import Parser, ParserDiff
+from colorama import Fore, Style
 from os import listdir
 from os.path import isdir, isfile, join
 from rich import print as rprint
 from json import dumps as json
 import argparse
+
+def warning(msg: str):
+  print(Fore.LIGHTYELLOW_EX + ('Aviso: %s' % msg) + Fore.RESET)
+
+def error(msg: str):
+  print(Fore.LIGHTRED_EX + ('Error: %s' % msg) + Fore.RESET)
 
 def diffsToDicts(diffs: list[ParserDiff]):
   dictionaryDiffs: list[dict] = []
@@ -24,6 +31,9 @@ def writeDiffs(diffs: list[ParserDiff], to: str):
   file.close()
 
 def get_files(path: str) -> list[str]:
+  if isfile(path):
+    error('%s no es un directorio' % path)
+    return []
   files: list[str] = []
   for f in listdir(path):
     file = join(path, f)
@@ -57,7 +67,7 @@ for old_file in old_files:
     new_file_idx = new_files.index(new_file_path)
   except ValueError as e:
     if not args.silent:
-      print('Aviso: %s no ha sido actualizado' % old_file)
+      warning('%s no ha sido actualizado' % old_file)
     continue
 
 
@@ -81,5 +91,6 @@ if not args.silent:
 # Exportar resultado (JSON)
 if args.out != None:
   if isdir(args.out):
-    print('Error: %s es un directorio' % args.out)
-  writeDiffs(diffs, args.out)
+    error('%s es un directorio' % args.out)
+  else:
+    writeDiffs(diffs, args.out)
