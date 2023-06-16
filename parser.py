@@ -103,19 +103,9 @@ class Parser:
       fix_element_in_multiple_cols=True,
     )
 
-  def thead(self):
-    return self.table[0]
-
-  def column(self, n = 0):
-    arr = []
-    for row in self.table:
-      arr.append(row[n])
-
-    return arr
-
   def to_csv(self, filename = None, table = None):
     if filename == None: filename = self.out_docname
-    if table == None: table = self.table
+    if table == None: table = self.format()
 
     with open(filename, 'w') as f:
       file = csv.writer(f)
@@ -132,12 +122,8 @@ class Parser:
     arr = []
     for e in self.elements:
       arr.append(e.text())
-    return arr
 
-  def list_elements(self):
-    element_list = self.get_raw_text()
-    for i in range(0, len(element_list)):
-      print(i+1, element_list[i], '\n')
+    return arr
 
   def equals(self, other: 'Parser'):
     return ''.join(self.get_raw_text()) == ''.join(other.get_raw_text());
