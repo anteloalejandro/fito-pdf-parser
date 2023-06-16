@@ -31,12 +31,14 @@ def get_files(path: str) -> list[str]:
 
   return files
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description="Parser para PDFs de productos fitosanitarios")
 parser.add_argument('-o', '--out', type=str, help='Archivo JSON de salida')
+parser.add_argument('--old', type=str, help='Directorio con las versiones viejas de los PDF')
+parser.add_argument('--new', type=str, help='Directorio con las versiones nuevas de los PDF')
 args = parser.parse_args()
 
-old_path = './old'
-new_path = './new'
+old_path = './old' if args.old == None else args.old
+new_path = './new' if args.new == None else args.new
 old_files = get_files(old_path)
 new_files = get_files(new_path)
 

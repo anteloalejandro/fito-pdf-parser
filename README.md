@@ -29,6 +29,12 @@ python3 main.py
 python3 main.py --out diffs.json
 ```
 
+## Cambiar directorios
+
+ ```bash
+ python3 main.py --old v1 --new v2
+ ```
+
 ## Resultado
 
 Ambas acciones responden con un JSON con el siguiente resultado:
