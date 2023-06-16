@@ -1,5 +1,5 @@
-from parser import Parser, ParserDiff
-from colorama import Fore, Style
+from parser import Parser, ParserDiff, ParserDiffCollection
+from colorama import Fore
 from os import listdir
 from os.path import isdir, isfile, join
 from rich import print as rprint
@@ -12,19 +12,12 @@ def warning(msg: str):
 def error(msg: str):
   print(Fore.LIGHTRED_EX + ('Error: %s' % msg) + Fore.RESET)
 
-def diffsToDicts(diffs: list[ParserDiff]):
-  dictionaryDiffs: list[dict] = []
-  for diff in diffs:
-    dictionaryDiffs.append(diff.__dict__)
+def printDiffs(diffs: ParserDiffCollection):
+  rprint(diffs.to_grouped_dictionary_list())
 
-  return dictionaryDiffs;
-
-def printDiffs(diffs: list[ParserDiff]):
-  rprint(diffsToDicts(diffs))
-
-def writeDiffs(diffs: list[ParserDiff], to: str):
+def writeDiffs(diffs: ParserDiffCollection, to: str):
   file = open(to, "w")
-  jsonDiffs = json(diffsToDicts(diffs), indent=4, ensure_ascii=False)
+  jsonDiffs = json(diffs.to_grouped_dictionary_list(), indent=4, ensure_ascii=False)
 
   file.writelines(jsonDiffs.splitlines(True))
 
@@ -43,14 +36,10 @@ def get_files(path: str) -> list[str]:
 
 # Argumentos
 parser = argparse.ArgumentParser(description="Parser para PDFs de productos fitosanitarios")
-parser.add_argument('-o', '--out', type=str,
-                    help='Archivo JSON de salida')
-parser.add_argument('--old', type=str,
-                    help='Directorio con las versiones viejas de los PDF')
-parser.add_argument('--new', type=str,
-                    help='Directorio con las versiones nuevas de los PDF')
-parser.add_argument('-s', '--silent', action='store_true',
-                    help='Directorio con las versiones nuevas de los PDF')
+parser.add_argument('-o', '--out', type=str, help='Archivo JSON de salida')
+parser.add_argument('--old', type=str, help='Directorio con las versiones viejas de los PDF')
+parser.add_argument('--new', type=str, help='Directorio con las versiones nuevas de los PDF')
+parser.add_argument('-s', '--silent', action='store_true', help='Directorio con las versiones nuevas de los PDF')
 args = parser.parse_args()
 
 # Rutas
@@ -60,7 +49,7 @@ old_files = get_files(old_path)
 new_files = get_files(new_path)
 
 # Sacar diferencias entre PDFs
-diffs: list[ParserDiff] = []
+diffs = ParserDiffCollection()
 for old_file in old_files:
   new_file_path = old_file.replace(old_path, new_path)
   try:
@@ -82,11 +71,11 @@ for old_file in old_files:
   # print('<============  %s  =============>' % new_file)
   # print(tabulate(new_parser.format()))
 
-  diffs += new_parser.diff(old_parser)
+  diffs.add(new_parser.diff(old_parser))
 
 # Mostrar resultado
 if not args.silent:
-    printDiffs(diffs)
+  printDiffs(diffs)
 
 # Exportar resultado (JSON)
 if args.out != None:

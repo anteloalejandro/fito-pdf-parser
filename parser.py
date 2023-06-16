@@ -2,6 +2,7 @@ from typing import Any
 from py_pdf_parser.loaders import load_file
 from py_pdf_parser import tables
 import csv
+import itertools
 
 class ParserDiff:
   def __init__(self, docname: str, msg: str, parserText = '', otherParserText = ''):
@@ -27,6 +28,37 @@ class ParserDiff:
   def __repr__(self) -> str:
     return self.__str__()
 
+class ParserDiffCollection:
+  diffs: list[ParserDiff]
+
+  def __init__(self, diffs: list[ParserDiff] | None = None):
+    self.diffs = diffs if diffs != None else []
+
+  def add(self, other: 'ParserDiffCollection'):
+    self.diffs += other.diffs
+
+  def append(self, other: 'ParserDiff'):
+    self.diffs.append(other);
+
+  def to_dictionary_list(self):
+    dictionary_diffs: list[dict] = []
+    for diff in self.diffs:
+      dictionary_diffs.append(diff.__dict__)
+
+    return dictionary_diffs;
+
+  def to_grouped_dictionary_list(self):
+    grouped: list[dict] = []
+    for key, values in itertools.groupby(self.diffs, key=lambda x:x.docname):
+      grouped += [{
+        'docname': key,
+        'changes': [{
+          "msg": diff.msg,
+          "diff": diff.diff
+        } for diff in values]
+      }]
+
+    return grouped
 
 class Parser:
 
@@ -110,18 +142,18 @@ class Parser:
   def equals(self, other: 'Parser'):
     return ''.join(self.get_raw_text()) == ''.join(other.get_raw_text());
 
-  def diff(self, other: 'Parser') -> list[ParserDiff]:
-    arr = []
+  def diff(self, other: 'Parser') -> ParserDiffCollection:
+    collection = ParserDiffCollection()
     selfLen = len(self.table)
     otherLen = len(other.table)
     if selfLen != otherLen:
-      arr.append(ParserDiff(self.docname, 'La cantidad de elementos no coincide'))
+      collection.append(ParserDiff(self.docname, 'La cantidad de elementos no coincide'))
 
     for index in range(0, min(selfLen, otherLen)):
       selfText = ''.join(self.table[index])
       otherText = ''.join(other.table[index])
       if (selfText != otherText):
-        arr.append(ParserDiff(self.docname, 'El texto no coincide', selfText, otherText))
+        collection.append(ParserDiff(self.docname, 'El texto no coincide', selfText, otherText))
 
 
-    return arr
+    return collection
