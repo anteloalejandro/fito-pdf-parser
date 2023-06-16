@@ -69,8 +69,8 @@ Ambas acciones responden con un JSON con el siguiente resultado:
             {
                 "msg": "El texto no coincide",
                 "diff": {
-                    "to": "Frutos cítricos; Penicilium, Penicillium spp.; 0,5 - 0,6 %; 25 l/t; Tratamiento en post-cosecha, mediante ducha sobre la fruta (drencher) durante 25-30 segundos. La \nfruta se dejará escurrir y secar bien antes de ser introducida en la cámara. Emplear un volumen de \ncaldo de 25 litros por tonelada de fruta tratada.",
-                    "from": "Frutos cítricos; PUDRICIÓN; 0,5 - 0,6 %; 25 l/t; Tratamiento en post-cosecha, mediante ducha sobre la fruta (drencher) durante 25-30 segundos. La \nfruta se dejará escurrir y secar bien antes de ser introducida en la cámara. Emplear un volumen de \ncaldo de 25 litros por tonelada de fruta tratada."
+                    "to": "Frutos cítricos; Penicilium, Penicillium spp.; 0,5 - 0,6 %",
+                    "from": "Frutos cítricos; PUDRICIÓN; 0,5 - 0,6 %"
                 }
             }
         ]
