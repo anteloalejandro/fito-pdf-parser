@@ -33,9 +33,14 @@ def get_files(path: str) -> list[str]:
 
 # Argumentos
 parser = argparse.ArgumentParser(description="Parser para PDFs de productos fitosanitarios")
-parser.add_argument('-o', '--out', type=str, help='Archivo JSON de salida')
-parser.add_argument('--old', type=str, help='Directorio con las versiones viejas de los PDF')
-parser.add_argument('--new', type=str, help='Directorio con las versiones nuevas de los PDF')
+parser.add_argument('-o', '--out', type=str,
+                    help='Archivo JSON de salida')
+parser.add_argument('--old', type=str,
+                    help='Directorio con las versiones viejas de los PDF')
+parser.add_argument('--new', type=str,
+                    help='Directorio con las versiones nuevas de los PDF')
+parser.add_argument('-s', '--silent', action='store_true',
+                    help='Directorio con las versiones nuevas de los PDF')
 args = parser.parse_args()
 
 # Rutas
@@ -51,7 +56,8 @@ for old_file in old_files:
   try:
     new_file_idx = new_files.index(new_file_path)
   except ValueError as e:
-    print('Aviso: %s no ha sido actualizado' % old_file)
+    if not args.silent:
+      print('Aviso: %s no ha sido actualizado' % old_file)
     continue
 
 
@@ -68,7 +74,12 @@ for old_file in old_files:
 
   diffs += new_parser.diff(old_parser)
 
-printDiffs(diffs)
+# Mostrar resultado
+if not args.silent:
+    printDiffs(diffs)
 
-if args.out != None and not isdir(args.out):
-    writeDiffs(diffs, args.out)
+# Exportar resultado (JSON)
+if args.out != None:
+  if isdir(args.out):
+    print('Error: %s es un directorio' % args.out)
+  writeDiffs(diffs, args.out)
