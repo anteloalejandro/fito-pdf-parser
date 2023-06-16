@@ -150,8 +150,8 @@ class Parser:
       collection.append(ParserDiff(self.docname, 'La cantidad de elementos no coincide'))
 
     for index in range(0, min(selfLen, otherLen)):
-      selfText = ''.join(self.table[index])
-      otherText = ''.join(other.table[index])
+      selfText = '; '.join(self.table[index])
+      otherText = '; '.join(other.table[index])
       if (selfText != otherText):
         collection.append(ParserDiff(self.docname, 'El texto no coincide', selfText, otherText))
 
