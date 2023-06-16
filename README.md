@@ -82,6 +82,6 @@ Ambas acciones responden con un JSON con el siguiente resultado:
 
 - [x] Opción para no imprimir el resultado
 - [x] Agrupar por fichero
-- [-] Separar diferencias por columna
+- [ ] Separar diferencias por columna
 - [ ] Mejorar rendimiento
 - [ ] Añadir opción para exportar los PDFs en CSV
