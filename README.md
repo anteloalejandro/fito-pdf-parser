@@ -25,15 +25,37 @@ python3 main.py
 
 ## Mostrar diferencias y exportar el resultado
 
+**Sintaxis normal**
+
 ```bash
 python3 main.py --out diffs.json
 ```
 
+**Sintaxis acortada**
+
+```bash
+python3 main.py -o diffs.json
+```
+
+## Exportar sin mostrar nada por pantalla
+
+**Sintaxis normal**
+
+```bash
+python main.py --silent --out diffs.json
+```
+
+**Sintaxis acortada**
+
+```bash
+python main.py -s -o diffs.json
+```
+
 ## Cambiar directorios
 
- ```bash
- python3 main.py --old v1 --new v2
- ```
+```bash
+python3 main.py --old v1 --new v2
+```
 
 ## Resultado
 
@@ -43,67 +65,17 @@ Ambas acciones responden con un JSON con el siguiente resultado:
 [
     {
         "docname": "./new/bad.pdf",
-        "msg": "La cantidad de elementos no coincide",
-        "diff": null
-    },
-    {
-        "docname": "./new/bad.pdf",
-        "msg": "El texto no coincide",
-        "diff": {
-            "to": "CebadaMonocotiledóneas anuales1,5 - 3 l/ha1200 - 400  l/haAplicar antes de la siembra (pre-emergencia).",
-            "from": "BerenjenaMildiu de la patata y el \ntomate, Phytophthora \ninfestans0,2 - 0,3 l/ha37200-1500 l/ha (Ver cond.)"
-        }
-    },
-    {
-        "docname": "./new/bad.pdf",
-        "msg": "El texto no coincide",
-        "diff": {
-            "to": "Dicotiledóneas anuales",
-            "from": "CalabacínMildiu de las cucurbitáceas, \nPseudoperonospora \ncubensis0,2 - 0,25 l/ha37200-1250 l/ha (Ver cond.)"
-        }
-    },
-    {
-        "docname": "./new/bad.pdf",
-        "msg": "El texto no coincide",
-        "diff": {
-            "to": "CítricosMonocotiledóneas anuales1,5 - 4,7 l/ha1200 - 600  l/haAplicar solo en la línea del cultivo.\nSe deben tener en cuenta las medidas de aplicación para evitar todo posible contacto de los frutos con \nel producto o con el suelo tratado.\nNo labrar el suelo tras la aplicación.\nAplicar de septiembre-noviembre hasta BBCH 85.",
-            "from": "CebollaMildiu de la cebolla, \nPeronospora destructor0,2 l/ha37200-1000 l/ha"
-        }
-    },
-    {
-        "docname": "./new/bad.pdf",
-        "msg": "El texto no coincide",
-        "diff": {
-            "to": "Dicotiledóneas anuales",
-            "from": "LechugaMildiu de la lechuga, Bremia \nlactucae0,15 l/ha2 ver cond.7200-1000 l/ha"
-        }
-    },
-    {
-        "docname": "./new/bad.pdf",
-        "msg": "El texto no coincide",
-        "diff": {
-            "to": "Frutales de huesoMonocotiledóneas anuales1,5 - 4,7 l/ha1200 - 600  l/haAplicar solo en la línea del cultivo.\nAsegurarse de que no hay frutos maduros en el suelo o en las plantas tratadas.\nNo labrar el suelo tras la aplicación.\nAplicar de febrero-abril hasta BBCH 69. \nAplicar solo en la línea del cultivo.\nAsegurarse de que no hay frutos maduros en el suelo o en las plantas tratadas.\nNo labrar el suelo tras la aplicación.\nAplicar de febrero-abril hasta BBCH 69.",
-            "from": "MelónMildiu de las cucurbitáceas, \nPseudoperonospora \ncubensis0,2 - 0,25 l/ha37200-1250 l/ha (Ver cond.)"
-        }
-    },
-    {
-        "docname": "./new/bad.pdf",
-        "msg": "El texto no coincide",
-        "diff": {
-            "to": "Dicotiledóneas anuales",
-            "from": "PatataMildiu de la patata y el \ntomate, Phytophthora \ninfestans\nMildiu de las cucurbitáceas, \nPseudoperonospora \ncubensis0,15 l/ha47300-1000 l/haAplicar al aire libre a un BBCH 10 hasta el plazo de seguridad. Aplicar una dosis fija (15 g sa/ha, \nindependientemente del volumen de caldo a utilizar)."
-        }
-    },
-    {
-        "docname": "./new/bad.pdf",
-        "msg": "El texto no coincide",
-        "diff": {
-            "to": "Frutales de pepitaMonocotiledóneas anuales1,5 - 4,7 l/ha1200 - 600  l/ha",
-            "from": "TomateMildiu de la patata y el \ntomate, Phytophthora \ninfestans0,2 - 0,3 l/ha37200-1500 l/ha (Ver cond.)"
-        }
+        "changes": [
+            {
+                "msg": "El texto no coincide",
+                "diff": {
+                    "to": "Frutos cítricos; Penicilium, Penicillium spp.; 0,5 - 0,6 %; 25 l/t; Tratamiento en post-cosecha, mediante ducha sobre la fruta (drencher) durante 25-30 segundos. La \nfruta se dejará escurrir y secar bien antes de ser introducida en la cámara. Emplear un volumen de \ncaldo de 25 litros por tonelada de fruta tratada.",
+                    "from": "Frutos cítricos; PUDRICIÓN; 0,5 - 0,6 %; 25 l/t; Tratamiento en post-cosecha, mediante ducha sobre la fruta (drencher) durante 25-30 segundos. La \nfruta se dejará escurrir y secar bien antes de ser introducida en la cámara. Emplear un volumen de \ncaldo de 25 litros por tonelada de fruta tratada."
+                }
+            }
+        ]
     }
 ]
-
  ```
 
 # TO-DO
