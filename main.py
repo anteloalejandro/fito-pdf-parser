@@ -86,8 +86,8 @@ for old_file in old_files:
   new_file = new_files[new_file_idx]
 
   # Si son idénticos, no parsear
-  # if (hash_file(old_file) == hash_file(new_file)):
-  #   continue
+  if (hash_file(old_file) == hash_file(new_file)):
+    continue
 
   current_file = ''
   try:
