@@ -1,11 +1,19 @@
-from parser import Parser, ParserDiff, ParserDiffCollection
+import hashlib
+from parser import Parser, ParserDiffCollection
 from colorama import Fore
 from os import listdir
 from os.path import isdir, isfile, join
 from rich import print as rprint
 from json import dumps as json
 import argparse
-from pdfminer.pdfparser import PDFSyntaxError
+
+# Argumentos
+parser = argparse.ArgumentParser(description="Parser para PDFs de productos fitosanitarios")
+parser.add_argument('-o', '--out', type=str, help='Archivo JSON de salida')
+parser.add_argument('--old', type=str, help='Directorio con las versiones viejas de los PDF')
+parser.add_argument('--new', type=str, help='Directorio con las versiones nuevas de los PDF')
+parser.add_argument('-s', '--silent', action='store_true', help='Directorio con las versiones nuevas de los PDF')
+args = parser.parse_args()
 
 def warning(msg: str):
   print(Fore.LIGHTYELLOW_EX + ('Aviso: %s' % msg) + Fore.RESET)
@@ -35,13 +43,15 @@ def get_files(path: str) -> list[str]:
 
   return files
 
-# Argumentos
-parser = argparse.ArgumentParser(description="Parser para PDFs de productos fitosanitarios")
-parser.add_argument('-o', '--out', type=str, help='Archivo JSON de salida')
-parser.add_argument('--old', type=str, help='Directorio con las versiones viejas de los PDF')
-parser.add_argument('--new', type=str, help='Directorio con las versiones nuevas de los PDF')
-parser.add_argument('-s', '--silent', action='store_true', help='Directorio con las versiones nuevas de los PDF')
-args = parser.parse_args()
+def hash_file(file: str) -> str:
+  hash = hashlib.md5()
+  with open(file, 'rb') as f:
+    chunk = 0
+    while chunk != b'':
+      chunk = f.read(1024)
+      hash.update(chunk)
+
+  return hash.hexdigest()
 
 # Rutas
 old_path = './old' if args.old == None else args.old
@@ -62,8 +72,10 @@ for old_file in old_files:
       warning('%s no ha sido actualizado' % old_file)
     continue
 
-
   new_file = new_files[new_file_idx]
+
+  if (hash_file(old_file) == hash_file(new_file)):
+    continue
 
   current_file = ''
   try:
