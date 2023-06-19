@@ -114,7 +114,11 @@ class Parser:
   def format(self):
     arr = []
     for row in self.table:
-      arr.append([row[0], row[1], row[2]])
+      n_of_columns = min(3, len(row))
+      arr.append([
+        row[cell_idx]
+        for cell_idx in range(0, n_of_columns)
+      ])
 
     return arr
 
@@ -136,7 +140,7 @@ class Parser:
       collection.append(ParserDiff(self.docname, 'La cantidad de elementos no coincide'))
 
     for index in range(0, min(selfLen, otherLen)):
-      n_of_columns = 3
+      n_of_columns = min(3, len(self.table[0]), len(other.table[0]))
 
       selfText = '; '.join([
         self.table[index][cell_idx]

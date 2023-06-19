@@ -16,10 +16,23 @@ parser.add_argument('-s', '--silent', action='store_true', help='Directorio con 
 args = parser.parse_args()
 
 def warning(msg: str):
-  print(Fore.LIGHTYELLOW_EX + ('Aviso: %s' % msg) + Fore.RESET)
+  msg = 'Aviso: %s' % msg
+  if args.silent:
+    log('warnings.log', msg)
+  else:
+    print(Fore.LIGHTYELLOW_EX + msg + Fore.RESET)
 
 def error(msg: str):
-  print(Fore.LIGHTRED_EX + ('Error: %s' % msg) + Fore.RESET)
+  msg = 'Error: %s' % msg
+  if args.silent:
+    log('errors.log', msg)
+  else:
+    print(Fore.LIGHTRED_EX + msg + Fore.RESET)
+
+def log(file: str, msg: str):
+  f = open(file, 'a')
+  f.write('%s\n' % msg)
+  f.close()
 
 def printDiffs(diffs: ParserDiffCollection):
   rprint(diffs.to_grouped_dictionary_list())
@@ -60,7 +73,6 @@ old_files = get_files(old_path)
 new_files = get_files(new_path)
 
 # Sacar diferencias entre PDFs
-
 diffs = ParserDiffCollection()
 
 for old_file in old_files:
@@ -68,14 +80,14 @@ for old_file in old_files:
   try:
     new_file_idx = new_files.index(new_file_path)
   except ValueError as e:
-    if not args.silent:
-      warning('%s no ha sido actualizado' % old_file)
+    warning('%s no ha sido actualizado' % old_file)
     continue
 
   new_file = new_files[new_file_idx]
 
-  if (hash_file(old_file) == hash_file(new_file)):
-    continue
+  # Si son idénticos, no parsear
+  # if (hash_file(old_file) == hash_file(new_file)):
+  #   continue
 
   current_file = ''
   try:
@@ -97,12 +109,11 @@ for old_file in old_files:
 
 
 # Mostrar resultado
-if not args.silent:
-  printDiffs(diffs)
+printDiffs(diffs)
 
-  # Exportar resultado (JSON)
-  if args.out != None:
-    if isdir(args.out):
-      error('%s es un directorio' % args.out)
-    else:
-      writeDiffs(diffs, args.out)
+# Exportar resultado (JSON)
+if args.out != None:
+  if isdir(args.out):
+    error('%s es un directorio' % args.out)
+  else:
+    writeDiffs(diffs, args.out)
