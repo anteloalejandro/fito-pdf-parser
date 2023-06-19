@@ -5,6 +5,7 @@ from os.path import isdir, isfile, join
 from rich import print as rprint
 from json import dumps as json
 import argparse
+from pdfminer.pdfparser import PDFSyntaxError
 
 def warning(msg: str):
   print(Fore.LIGHTYELLOW_EX + ('Aviso: %s' % msg) + Fore.RESET)
@@ -49,7 +50,9 @@ old_files = get_files(old_path)
 new_files = get_files(new_path)
 
 # Sacar diferencias entre PDFs
+
 diffs = ParserDiffCollection()
+
 for old_file in old_files:
   new_file_path = old_file.replace(old_path, new_path)
   try:
@@ -62,24 +65,32 @@ for old_file in old_files:
 
   new_file = new_files[new_file_idx]
 
-  old_parser = Parser(old_file)
-  new_parser = Parser(new_file)
+  current_file = ''
+  try:
+    current_file = old_file
+    old_parser = Parser(current_file)
+    current_file = new_file
+    new_parser = Parser(current_file)
+    diffs.add(new_parser.diff(old_parser))
+  except Exception as e:
+    error('%s ON %s' % (e.__str__(), current_file))
 
-  ## DEBUG
-  # print('<============  %s  =============>' % old_file)
-  # print(tabulate(old_parser.format()))
-  # print('<============  %s  =============>' % new_file)
-  # print(tabulate(new_parser.format()))
 
-  diffs.add(new_parser.diff(old_parser))
+## DEBUG
+# print('<============  %s  =============>' % old_file)
+# print(tabulate(old_parser.format()))
+# print('<============  %s  =============>' % new_file)
+# print(tabulate(new_parser.format()))
+
+
 
 # Mostrar resultado
 if not args.silent:
   printDiffs(diffs)
 
-# Exportar resultado (JSON)
-if args.out != None:
-  if isdir(args.out):
-    error('%s es un directorio' % args.out)
-  else:
-    writeDiffs(diffs, args.out)
+  # Exportar resultado (JSON)
+  if args.out != None:
+    if isdir(args.out):
+      error('%s es un directorio' % args.out)
+    else:
+      writeDiffs(diffs, args.out)
