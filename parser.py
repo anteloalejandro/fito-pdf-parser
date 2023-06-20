@@ -9,8 +9,8 @@ class ParserDiff:
     self.docname = docname
     self.msg = msg
     self.diff = None if parserText == '' or otherParserText == '' else {
-      'to': parserText,
-      'from': otherParserText
+      'from': otherParserText,
+      'to': parserText
     }
 
     self.__dict__ = {
