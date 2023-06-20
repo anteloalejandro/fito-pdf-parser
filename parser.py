@@ -138,6 +138,8 @@ class Parser:
     otherLen = len(other.table)
     if selfLen != otherLen:
       collection.append(ParserDiff(self.docname, 'La cantidad de elementos no coincide'))
+      # Evitar reporte de errores inexacto cuando la cantidad de elementos no coincide
+      return collection
 
     for index in range(0, min(selfLen, otherLen)):
       n_of_columns = min(3, len(self.table[0]), len(other.table[0]))
