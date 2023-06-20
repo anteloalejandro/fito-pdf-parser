@@ -129,7 +129,7 @@ if not args.silent:
 if isdir(diffs_json):
   error('%s es un directorio' % args.out)
 else:
-  writeDiffs(diffs, args.out)
+  writeDiffs(diffs, diffs_json)
 
 # Exportar resultado (LOG)
 if isdir(changes_log):
