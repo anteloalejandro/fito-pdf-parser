@@ -1,6 +1,6 @@
 import hashlib
 from datetime import datetime
-from parser import Parser, ParserDiff, ParserDiffCollection
+from parser import TableParser, TableParserDiff, TableParserDiffCollection
 from colorama import Fore
 from os import listdir
 from os.path import isdir, isfile, join
@@ -47,10 +47,10 @@ def log(file: str, msg: str):
   f.write('%s\n' % msg)
   f.close()
 
-def printDiffs(diffs: ParserDiffCollection):
+def printDiffs(diffs: TableParserDiffCollection):
   rprint(diffs.to_grouped_dictionary_list())
 
-def writeDiffs(diffs: ParserDiffCollection, to: str):
+def writeDiffs(diffs: TableParserDiffCollection, to: str):
   file = open(to, "w")
   jsonDiffs = json(diffs.to_grouped_dictionary_list(), indent=4, ensure_ascii=False)
 
@@ -86,7 +86,7 @@ old_files = get_files(old_path)
 new_files = get_files(new_path)
 
 # Sacar diferencias entre PDFs
-diffs = ParserDiffCollection()
+diffs = TableParserDiffCollection()
 
 for old_file in old_files:
   new_file_path = old_file.replace(old_path, new_path)
@@ -105,9 +105,9 @@ for old_file in old_files:
   current_file = ''
   try:
     current_file = old_file
-    old_parser = Parser(current_file)
+    old_parser = TableParser(current_file)
     current_file = new_file
-    new_parser = Parser(current_file)
+    new_parser = TableParser(current_file)
     diffs.add(new_parser.diff(old_parser))
   except Exception as e:
     error('%s ON %s' % (e.__str__(), current_file))

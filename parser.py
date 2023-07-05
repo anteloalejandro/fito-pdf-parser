@@ -5,7 +5,7 @@ from py_pdf_parser import tables
 import csv
 import itertools
 
-class ParserDiff:
+class TableParserDiff:
   def __init__(self, docname: str, msg: str, parserText = '', otherParserText = ''):
     self.docname = docname
     self.msg = msg
@@ -29,16 +29,16 @@ class ParserDiff:
   def __repr__(self) -> str:
     return self.__str__()
 
-class ParserDiffCollection:
-  diffs: list[ParserDiff]
+class TableParserDiffCollection:
+  diffs: list[TableParserDiff]
 
-  def __init__(self, diffs: list[ParserDiff] | None = None):
+  def __init__(self, diffs: list[TableParserDiff] | None = None):
     self.diffs = diffs if diffs != None else []
 
-  def add(self, other: 'ParserDiffCollection'):
+  def add(self, other: 'TableParserDiffCollection'):
     self.diffs += other.diffs
 
-  def append(self, other: 'ParserDiff'):
+  def append(self, other: 'TableParserDiff'):
     self.diffs.append(other);
 
   def to_dictionary_list(self):
@@ -61,7 +61,7 @@ class ParserDiffCollection:
 
     return grouped
 
-class Parser:
+class TableParser:
 
   def __init__(self, pdf_name: str, csv_name: str | None = None):
     self.docname = pdf_name
@@ -130,15 +130,15 @@ class Parser:
 
     return arr
 
-  def equals(self, other: 'Parser'):
+  def equals(self, other: 'TableParser'):
     return ''.join(self.get_raw_text()) == ''.join(other.get_raw_text());
 
-  def diff(self, other: 'Parser') -> ParserDiffCollection:
-    collection = ParserDiffCollection()
+  def diff(self, other: 'TableParser') -> TableParserDiffCollection:
+    collection = TableParserDiffCollection()
     selfLen = len(self.table)
     otherLen = len(other.table)
     if selfLen != otherLen:
-      collection.append(ParserDiff(self.docname, 'La cantidad de elementos no coincide'))
+      collection.append(TableParserDiff(self.docname, 'La cantidad de elementos no coincide'))
       # Evitar reporte de errores inexacto cuando la cantidad de elementos no coincide
       return collection
 
@@ -160,7 +160,79 @@ class Parser:
       )
 
       if (selfText != otherText):
-        collection.append(ParserDiff(self.docname, 'El texto no coincide', selfText, otherText))
+        collection.append(TableParserDiff(self.docname, 'El texto no coincide', selfText, otherText))
 
 
     return collection
+
+class UsageConditionsParser:
+  def __init__(self, pdf_name: str, csv_name: str | None = None):
+    self.docname = pdf_name
+    self.out_docname = csv_name if csv_name != None else pdf_name.replace('.pdf', '.csv')
+
+    self.FONT_MAPPING = {
+      "Helvetica-Bold,12.0": "header",
+      "Helvetica,11.0": "text",
+      "Helvetica-Bold,9.0": "heading_start",
+      "Helvetica-Bold,10.0": "footer_end",
+    }
+    self.document = load_file(self.docname, font_mapping=self.FONT_MAPPING)
+
+    self.headers = self.document.elements.filter_by_font("header")
+
+    self.headings = self.document.elements.filter_by_font("heading_start").filter_by_text_equal(
+      "DIRECCIÓN GENERAL DE SANIDAD DE\nLA PRODUCCIÓN AGRARIA"
+    )
+
+    self.footers = self.document.elements.filter_by_font("footer_end").filter_by_text_equal(
+      "Página"
+    )
+
+    filtered_header = self.headers.filter_by_text_equal(
+      "Condiciones Generales de Uso"
+    )
+    self.header = None
+    if (len(filtered_header) > 0):
+      self.header = filtered_header.extract_single_element()
+
+    self.post_text = self.headers.filter_by_text_contains(
+      "Clase de Usuario"
+    ).extract_single_element()
+
+    if (self.header != None):
+      self.elements = self.document.elements.between(
+        self.header, self.post_text
+      ).filter_by_font("text")
+    else:
+      self.elements = self.document.elements.filter_by_text_contains("Condiciones Generales de Uso").before(self.post_text)
+
+    self.__dict__ = {
+      "docname": self.docname,
+      "text": self.__str__()
+    }
+
+  def __str__(self) -> str:
+    out = ''
+    for e in self.elements:
+      out += e.text() + ' '
+
+    return out
+
+class UsageConditionsParserCollection:
+  usage_conditions: list[UsageConditionsParser]
+
+  def __init__(self, usage_conditions: list[UsageConditionsParser] | None = None):
+    self.usage_conditions = usage_conditions if usage_conditions != None else []
+
+  def add(self, other: 'UsageConditionsParserCollection'):
+    self.usage_conditions += other.usage_conditions
+
+  def append(self, other: 'UsageConditionsParser'):
+    self.usage_conditions.append(other);
+
+  def to_dictionary_list(self):
+    dictionary: list[dict] = []
+    for uc in self.usage_conditions:
+      dictionary.append(uc.__dict__)
+
+    return dictionary;
