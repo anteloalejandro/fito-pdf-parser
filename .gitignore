@@ -2,9 +2,9 @@
 *.csv
 *.pdf
 *.json
+*.old
 __pycache__/
 main.build/
 main.dist/
 main.onefile-build/
 main.bin
-notas.md

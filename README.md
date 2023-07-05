@@ -4,51 +4,52 @@ Script hecho en python que extrae información de las tablas usando `py-pdf-pars
 
 # Dependencias
 
-Para que funcione el script se han de instalar las siguientes dependencias.
+Todas las dependencias de los archivos de este repositorio se encuentran listadas en el archivo `requirements.txt`.
 
 ```bash
-pip install rich
-pip install py-pdf-parser[dev]
+pip install -r requirements.txt
 ```
 
 # Método de uso
 
-`main.py` sirve para comprobar las diferencias entre los PDF de dos directorios diferentes. Por defecto el script busca los directorios `new/` y `old/`, que deberán crearse y llenarse de PDFs.
+`main.py` sirve para comprobar las diferencias entre los PDF de dos directorios diferentes.
 
 Este código está pensado para comprobar cuando una versión nueva de los PDFs ha actualizado la información de su tabla, para lo que es necesario que ambos directorios tengan PDFs con el mismo nombre.
 
-## Mostrar diferencias
+## Ejecutar
+
+Por defecto el script compara los PDFs de los directorios `new/` y `old/` y exporta todas las diferencias un archivo `diffs.json`. Además, genera los archivos de log `warnings.log`, `errors.log` y `changes.log` y les añade información precedida por la fecha actual.
 
 ```bash
 python3 main.py
 ```
 
-## Mostrar diferencias y exportar el resultado
+## Especificar el archivo al que se exporta
 
 **Sintaxis normal**
 
 ```bash
-python3 main.py --out diffs.json
+python3 main.py --out my_file.json
 ```
 
 **Sintaxis acortada**
 
 ```bash
-python3 main.py -o diffs.json
+python3 main.py -o my_file.json
 ```
 
-## Exportar sin mostrar nada por pantalla
+## Ejecutar sin mostrar nada por pantalla
 
 **Sintaxis normal**
 
 ```bash
-python main.py --silent --out diffs.json
+python main.py --silent
 ```
 
 **Sintaxis acortada**
 
 ```bash
-python main.py -s -o diffs.json
+python main.py -s
 ```
 
 ## Cambiar directorios
@@ -69,8 +70,8 @@ Ambas acciones responden con un JSON con el siguiente resultado:
             {
                 "msg": "El texto no coincide",
                 "diff": {
-                    "to": "Frutos cítricos; Penicilium, Penicillium spp.; 0,5 - 0,6 %",
                     "from": "Frutos cítricos; PUDRICIÓN; 0,5 - 0,6 %"
+                    "to": "Frutos cítricos; Penicilium, Penicillium spp.; 0,5 - 0,6 %",
                 }
             }
         ]
@@ -82,6 +83,7 @@ Ambas acciones responden con un JSON con el siguiente resultado:
 
 - [x] Opción para no imprimir el resultado
 - [x] Agrupar por fichero
-- [ ] Separar diferencias por columna
+- [x] Separar diferencias por columna
+- [ ] Mostrar los contenidos de la tabla 'Condiciones Generales de Uso'
 - [ ] Mejorar rendimiento
 - [ ] Añadir opción para exportar los PDFs en CSV
