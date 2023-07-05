@@ -1,4 +1,5 @@
 from typing import Any
+from unidecode import unidecode
 from py_pdf_parser.loaders import load_file
 from py_pdf_parser import tables
 import csv
@@ -144,14 +145,19 @@ class Parser:
     for index in range(0, min(selfLen, otherLen)):
       n_of_columns = min(3, len(self.table[0]), len(other.table[0]))
 
-      selfText = '; '.join([
-        self.table[index][cell_idx]
-        for cell_idx in range(0, n_of_columns)
-      ])
-      otherText = '; '.join([
-        other.table[index][cell_idx]
-        for cell_idx in range(0, n_of_columns)
-      ])
+      selfText = unidecode(
+        '; '.join([
+          self.table[index][cell_idx]
+          for cell_idx in range(0, n_of_columns)
+        ]).lower()
+      )
+      otherText = unidecode(
+        '; '.join([
+          other.table[index][cell_idx]
+          for cell_idx in range(0, n_of_columns)
+        ]).lower()
+
+      )
 
       if (selfText != otherText):
         collection.append(ParserDiff(self.docname, 'El texto no coincide', selfText, otherText))
