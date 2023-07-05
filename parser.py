@@ -1,4 +1,7 @@
+from os import replace
+import re
 from typing import Any
+from matplotlib import text
 from unidecode import unidecode
 from py_pdf_parser.loaders import load_file
 from py_pdf_parser import tables
@@ -188,12 +191,12 @@ class UsageConditionsParser:
       "Página"
     )
 
-    filtered_header = self.headers.filter_by_text_equal(
+    filtered_headers = self.headers.filter_by_text_equal(
       "Condiciones Generales de Uso"
     )
     self.header = None
-    if (len(filtered_header) > 0):
-      self.header = filtered_header.extract_single_element()
+    if (len(filtered_headers) > 0):
+      self.header = filtered_headers.extract_single_element()
 
     self.post_text = self.headers.filter_by_text_contains(
       "Clase de Usuario"
@@ -214,7 +217,13 @@ class UsageConditionsParser:
   def __str__(self) -> str:
     out = ''
     for e in self.elements:
-      out += e.text() + ' '
+      text = e.text()
+
+      if self.header == None:
+        # text = text.replace("Condiciones Generales de Uso", '')
+        text = re.sub('^Condiciones Generales de Uso', '', text)
+
+      out += text + ' '
 
     return out
 

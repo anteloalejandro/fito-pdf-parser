@@ -122,8 +122,8 @@ for old_file in old_files:
 
 
 # Mostrar resultado
-if not args.silent:
-  printDiffs(diffs)
+# if not args.silent:
+#   printDiffs(diffs)
 
 # Exportar resultado (JSON)
 if isdir(diffs_json):
